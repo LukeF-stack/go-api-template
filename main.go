@@ -7,5 +7,7 @@ import (
 
 func main() {
 	fmt.Println("Run main!")
-	database.Test()
+	db := database.GetDB()
+	defer db.Close()
+	fmt.Println(db.Ping())
 }
