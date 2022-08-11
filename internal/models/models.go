@@ -22,9 +22,15 @@ type Field struct {
 
 var ModelTables []Table
 
-var BookModel = Table{Name: "Book", Fields: []Field{{Column: "author", DataType: "string"}}}
+var BookModel = Table{
+	Name: "Book",
+	Fields: []Field{
+		Field{Column: "author", DataType: "string"},
+	},
+}
 
 func (database *Database) Init() {
+	ModelTables = append(ModelTables, BookModel)
 	database.Tables = ModelTables
 	for i := 0; i < len(database.Tables); i++ {
 		jsonObj, err := json.Marshal(database.Tables[i])
