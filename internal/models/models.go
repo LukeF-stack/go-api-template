@@ -2,42 +2,42 @@ package models
 
 import (
 	"encoding/json"
+	"example/bookAPI/internal/models/book"
+	"example/bookAPI/internal/models/model_types"
 	"fmt"
 	"log"
 )
 
+type Constraint interface {
+	model_types.Table
+}
+
+type Iterator interface {
+	forEach(callback callback)
+}
+
 type Database struct {
-	Tables []Table
+	Tables []model_types.Table
 }
 
-type Table struct {
-	Name   string
-	Fields []Field
-}
+type callback func(model_types.Table, int)
 
-type Field struct {
-	Column   string
-	DataType string
-}
-
-var ModelTables []Table
-
-var BookModel = Table{
-	Name: "Book",
-	Fields: []Field{
-		Field{Column: "author", DataType: "string"},
-	},
+func (database *Database) forEach(callback callback) {
+	for i := 0; i < len(database.Tables); i++ {
+		callback(database.Tables[i], i)
+	}
 }
 
 func (database *Database) Init() {
-	ModelTables = append(ModelTables, BookModel)
-	database.Tables = ModelTables
-	for i := 0; i < len(database.Tables); i++ {
-		jsonObj, err := json.Marshal(database.Tables[i])
+	database.Tables = append(database.Tables,
+		book.BookModel,
+	)
+	database.forEach(func(table model_types.Table, i int) {
+		jsonObj, err := json.Marshal(table)
 		if err != nil {
 			log.Fatal(err)
 		} else {
 			fmt.Println(string(jsonObj))
 		}
-	}
+	})
 }
