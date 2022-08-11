@@ -1,7 +1,7 @@
 package main
 
 import (
-	database "example/bookAPI/internal"
+	"example/bookAPI/internal/database"
 	"fmt"
 )
 
@@ -10,5 +10,4 @@ func main() {
 	connection := new(database.Connection)
 	connection.Init()
 	defer connection.Unmount()
-
 }

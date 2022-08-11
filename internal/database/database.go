@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"example/bookAPI/internal/models"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
@@ -29,6 +30,8 @@ func (connection *Connection) Init() {
 		connection.Db = db
 		fmt.Println("connected to database")
 	}
+	tables := new(models.Database)
+	tables.Init()
 }
 
 func (connection *Connection) Unmount() {
