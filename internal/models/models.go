@@ -11,6 +11,7 @@ type Database struct {
 }
 
 type Table struct {
+	Name   string
 	Fields []Field
 }
 
@@ -19,13 +20,12 @@ type Field struct {
 	DataType string
 }
 
+var ModelTables []Table
+
+var BookModel = Table{Name: "Book", Fields: []Field{{Column: "author", DataType: "string"}}}
+
 func (database *Database) Init() {
-	var fieldFields []Field
-	fieldFields = append(fieldFields, Field{Column: "field", DataType: "string"})
-	var book Table = Table{Fields: fieldFields}
-	for i := 0; i < 2; i++ {
-		database.Tables = append(database.Tables, book)
-	}
+	database.Tables = ModelTables
 	for i := 0; i < len(database.Tables); i++ {
 		jsonObj, err := json.Marshal(database.Tables[i])
 		if err != nil {
