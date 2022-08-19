@@ -2,9 +2,12 @@ package database
 
 import (
 	"database/sql"
-	"example/bookAPI/internal/models"
+	"example/bookAPI/internal/models/author"
+	"example/bookAPI/internal/models/book"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
 )
 
@@ -13,7 +16,7 @@ type Connectioner interface {
 }
 
 type Connection struct {
-	Db *sql.DB
+	Db *gorm.DB
 }
 
 func (connection *Connection) Init() {
@@ -23,17 +26,18 @@ func (connection *Connection) Init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	} else {
-		connection.Db = db
-		fmt.Println("connected to database")
+	gormDB, err := gorm.Open(mysql.New(
+		mysql.Config{
+			Conn: db,
+		}), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
 	}
-	tables := new(models.Database)
-	tables.Init()
-}
+	connection.Db = gormDB
+	fmt.Println("connected to database")
 
-func (connection *Connection) Unmount() {
-	connection.Db.Close()
+	connection.Db.AutoMigrate(
+		&author.Author{},
+		&book.Book{},
+	)
 }
