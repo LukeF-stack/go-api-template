@@ -19,7 +19,7 @@ type Connection struct {
 	Db *gorm.DB
 }
 
-func (connection *Connection) Init() {
+func (connection *Connection) Init(finished chan<- bool) {
 	fmt.Println("opening database connection...")
 	db, err := sql.Open("mysql",
 		"root@tcp(127.0.0.1:23306)/library")
@@ -35,9 +35,11 @@ func (connection *Connection) Init() {
 	}
 	connection.Db = gormDB
 	fmt.Println("connected to database")
-
+	fmt.Println("migrating...")
 	connection.Db.AutoMigrate(
 		&author.Author{},
 		&book.Book{},
 	)
+	fmt.Println("migration complete")
+	finished <- true
 }
