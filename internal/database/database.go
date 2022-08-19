@@ -2,8 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"example/bookAPI/internal/models/author"
-	"example/bookAPI/internal/models/book"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -35,11 +33,5 @@ func (connection *Connection) Init(finished chan<- bool) {
 	}
 	connection.Db = gormDB
 	fmt.Println("connected to database")
-	fmt.Println("migrating...")
-	connection.Db.AutoMigrate(
-		&author.Author{},
-		&book.Book{},
-	)
-	fmt.Println("migration complete")
 	finished <- true
 }
