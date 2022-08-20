@@ -35,3 +35,7 @@ func (connection *Connection) Init(finished chan<- bool) {
 	fmt.Println("connected to database")
 	finished <- true
 }
+
+func getDB() {
+
+}

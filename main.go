@@ -2,6 +2,7 @@ package main
 
 import (
 	"example/bookAPI/internal/database"
+	"example/bookAPI/internal/server"
 	"fmt"
 )
 
@@ -13,4 +14,5 @@ func main() {
 	fmt.Println("Main: Waiting for db connection to finish")
 	<-awaitConn
 	fmt.Println("Main: Database Connected")
+	server.Init(connection)
 }
