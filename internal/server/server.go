@@ -4,12 +4,19 @@ import (
 	"example/bookAPI/internal/database"
 	"example/bookAPI/internal/routes/books"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
-func Init(connection *database.Connection) {
-	app := fiber.New()
-	books.Init(app, connection)
-	err := app.Listen(":3000")
+type Server struct {
+	DB  *gorm.DB
+	App *fiber.App
+}
+
+func (server *Server) Init(connection *database.Connection) {
+	server.App = fiber.New()
+	server.DB = connection.Db
+	books.Init(server.App, server.DB)
+	err := server.App.Listen(":3000")
 	if err != nil {
 		panic(err)
 	}

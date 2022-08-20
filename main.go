@@ -14,5 +14,6 @@ func main() {
 	fmt.Println("Main: Waiting for db connection to finish")
 	<-awaitConn
 	fmt.Println("Main: Database Connected")
-	server.Init(connection)
+	apiServer := new(server.Server)
+	apiServer.Init(connection)
 }
