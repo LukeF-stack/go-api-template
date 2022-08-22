@@ -24,6 +24,7 @@ func (connection *Connection) Init(finished chan<- bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.SetMaxIdleConns(10)
 	gormDB, err := gorm.Open(mysql.New(
 		mysql.Config{
 			Conn: db,
@@ -34,8 +35,4 @@ func (connection *Connection) Init(finished chan<- bool) {
 	connection.Db = gormDB
 	fmt.Println("connected to database")
 	finished <- true
-}
-
-func getDB() {
-
 }

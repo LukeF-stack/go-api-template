@@ -11,7 +11,7 @@ import (
 
 func Init(app *fiber.App, database *gorm.DB) {
 	app.Get("/book/create", func(c *fiber.Ctx) error {
-		success := false
+		var success bool = false
 		var error []error
 		newBook := book.Book{Name: "New Book", AuthorID: 1}
 		result := database.Create(&newBook)
