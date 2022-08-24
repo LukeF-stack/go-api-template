@@ -17,7 +17,6 @@ type Connection struct {
 }
 
 func (connection *Connection) Init(finished chan<- bool, errors chan<- error) {
-	errors <- fmt.Errorf("")
 	fmt.Println("opening database connection...")
 	db, err := sql.Open("mysql",
 		"root@tcp(127.0.0.1:23306)/library")

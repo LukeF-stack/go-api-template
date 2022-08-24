@@ -4,6 +4,7 @@ import (
 	"example/bookAPI/internal/database"
 	"example/bookAPI/internal/server"
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -12,7 +13,10 @@ func main() {
 	awaitConn := make(chan bool)
 	err := make(chan error)
 	go connection.Init(awaitConn, err)
-	fmt.Println(<-err)
+	error := <-err
+	if error != nil {
+		log.Fatal(error)
+	}
 	fmt.Println("Main: Waiting for db connection to finish")
 	<-awaitConn
 	fmt.Println("Main: Database Connected")

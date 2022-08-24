@@ -6,6 +6,7 @@ import (
 	"example/bookAPI/internal/server/utils"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"log"
 )
 
 type Server struct {
@@ -23,6 +24,6 @@ func (server *Server) Init(connection *database.Connection) {
 	routes.Register(server.App)
 	err := server.App.Listen(":3000")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
