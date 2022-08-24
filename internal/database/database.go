@@ -6,7 +6,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 type Connectioner interface {
@@ -17,12 +16,13 @@ type Connection struct {
 	Db *gorm.DB
 }
 
-func (connection *Connection) Init(finished chan<- bool) {
+func (connection *Connection) Init(finished chan<- bool, errors chan<- error) {
+	errors <- fmt.Errorf("")
 	fmt.Println("opening database connection...")
 	db, err := sql.Open("mysql",
 		"root@tcp(127.0.0.1:23306)/library")
 	if err != nil {
-		log.Fatal(err)
+		errors <- err
 	}
 	db.SetMaxIdleConns(10)
 	gormDB, err := gorm.Open(mysql.New(
@@ -30,7 +30,7 @@ func (connection *Connection) Init(finished chan<- bool) {
 			Conn: db,
 		}), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		errors <- err
 	}
 	connection.Db = gormDB
 	fmt.Println("connected to database")

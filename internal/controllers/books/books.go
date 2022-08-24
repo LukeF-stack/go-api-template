@@ -11,19 +11,20 @@ import (
 
 func CreateBook(c *fiber.Ctx) error {
 	database := utils.GetLocal[*gorm.DB](c, "db")
-	var success = false
+	var status = 500
 	var error []error
 	newBook := book.Book{Name: "New Book", AuthorID: 1}
 	result := database.Create(&newBook)
 	if result.Error != nil {
 		error = append(error, result.Error)
-		panic(result.Error)
+		return result.Error
 	} else {
-		success = true
+		status = 201
 	}
-	response, err := json.Marshal(types.Response{Error: error, Success: success})
+	response, err := json.Marshal(types.Response{Error: error})
 	if err != nil {
-		panic(err)
+		return err
 	}
+	c.Status(status)
 	return c.Send(response)
 }

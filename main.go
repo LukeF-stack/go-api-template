@@ -8,9 +8,11 @@ import (
 
 func main() {
 	fmt.Println("Main: Starting Application")
-	awaitConn := make(chan bool)
 	connection := new(database.Connection)
-	go connection.Init(awaitConn)
+	awaitConn := make(chan bool)
+	err := make(chan error)
+	go connection.Init(awaitConn, err)
+	fmt.Println(<-err)
 	fmt.Println("Main: Waiting for db connection to finish")
 	<-awaitConn
 	fmt.Println("Main: Database Connected")
