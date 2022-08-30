@@ -19,7 +19,7 @@ type Connection struct {
 func (connection *Connection) Init(error chan<- error) {
 	fmt.Println("opening database connection...")
 	db, err := sql.Open("mysql",
-		"root@tcp(127.0.0.1:23306)/library")
+		"root@tcp(127.0.0.1:23306)/library?charset=utf8mb4&parseTime=True&loc=Local")
 	if err != nil {
 		error <- err
 	}

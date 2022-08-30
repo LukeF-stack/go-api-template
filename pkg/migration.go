@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"example/bookAPI/internal/models/author"
 	"example/bookAPI/internal/models/book"
+	"example/bookAPI/internal/models/user"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -28,6 +29,7 @@ func main() {
 	err = gormDB.AutoMigrate(
 		&author.Author{},
 		&book.Book{},
+		&user.User{},
 	)
 	if err != nil {
 		log.Fatal(err)

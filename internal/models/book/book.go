@@ -7,7 +7,7 @@ import (
 
 type Book struct {
 	gorm.Model
-	AuthorID int
+	AuthorID int `json:"authorId"`
 	Author   author.Author
-	Name     string
+	Name     string `json:"name"`
 }
