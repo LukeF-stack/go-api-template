@@ -3,7 +3,7 @@ package types
 import "github.com/gofiber/fiber/v2"
 
 type Response struct {
-	Error []error
+	Error []string
 	Data  Data
 }
 

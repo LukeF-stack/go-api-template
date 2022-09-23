@@ -11,15 +11,15 @@ import (
 func CreateAuthor(c *fiber.Ctx) error {
 	database := utils.GetLocal[*gorm.DB](c, "db")
 	var status = 500
-	var e []error
+	var e []string
 	var authorModel author.Author
 	err := c.BodyParser(&authorModel)
 	if err != nil {
-		e = append(e, err)
+		e = append(e, err.Error())
 	}
 	statement := database.Create(&authorModel)
 	if statement.Error != nil {
-		e = append(e, statement.Error)
+		e = append(e, statement.Error.Error())
 	} else {
 		status = 201
 	}
@@ -30,17 +30,19 @@ func CreateAuthor(c *fiber.Ctx) error {
 func GetAuthor(c *fiber.Ctx) error {
 	database := utils.GetLocal[*gorm.DB](c, "db")
 	var status = 500
-	var e []error
+	var e []string
 	var data types.Data = nil
 	var authorModel author.Author
-	query := database.First(&authorModel, c.Params("id"))
+	query := database.First(&authorModel, c.Query("id"))
 	if query.Error != nil {
-		e = append(e, query.Error)
+		e = append(e, query.Error.Error())
 	} else {
 		status = 200
 	}
 	data = make(map[string]any)
-	data["author"] = authorModel
+	if len(e) <= 0 {
+		data["author"] = authorModel
+	}
 	c.Status(status)
 	return c.JSON(types.Response{Error: e, Data: data})
 }
