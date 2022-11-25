@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  db:
+    container_name: db
+    networks:
+      - bookAPI
+    image: mariadb:10.3.10-bionic
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    ports:
+      - 23306:3306
+    volumes:
+      #      - ../../_MariaDbData/db:/var/lib/mysql
+      - ../../_MariaDbData/conf:/etc/mysql/conf.d
+      - mariadbdata:/var/lib/mysql
+
+networks:
+  bookAPI:
+
+volumes:
+  mariadbdata:
+    driver: local
