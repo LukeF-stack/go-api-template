@@ -33,7 +33,7 @@ func GetBook(c *fiber.Ctx) error {
 	var e []string
 	var data types.Data = nil
 	var bookModel book.Book
-	query := database.First(&bookModel, c.Query("id"))
+	query := database.Preload("Author").First(&bookModel, c.Query("id"))
 	if query.Error != nil {
 		e = append(e, query.Error.Error())
 	} else {
