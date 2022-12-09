@@ -3,6 +3,7 @@ package server
 import (
 	"example/bookAPI/internal/config"
 	"example/bookAPI/internal/database"
+	"example/bookAPI/internal/middleware"
 	"example/bookAPI/internal/routes"
 	"example/bookAPI/internal/server/types"
 	"example/bookAPI/internal/server/utils"
@@ -28,6 +29,8 @@ func (server *Server) Init(connection *database.Connection) {
 	})
 	// configure firebase
 	firebaseAuth := config.SetupFirebase()
+	//_, err = firebaseAuth.VerifyIDToken(context.Background(), token)
+	//fmt.Println(err)
 	server.App.Use(func(c *fiber.Ctx) error {
 		utils.SetLocal[*auth.Client](c, "firebaseAuth", firebaseAuth)
 		return c.Next()
@@ -37,6 +40,7 @@ func (server *Server) Init(connection *database.Connection) {
 		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
 		AllowHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
 	}))
+	server.App.Use(middleware.AuthMiddleware)
 	routes.Register(server.App, server.Groups)
 	err := server.App.Listen(":3000")
 	if err != nil {

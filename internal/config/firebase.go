@@ -4,7 +4,6 @@ import (
 	"context"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	"fmt"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"log"
@@ -37,8 +36,6 @@ func SetupFirebase() *auth.Client {
 	authURI := os.Getenv("SERVICE_ACC_AUTH_URI")
 	tokenURI := os.Getenv("SERVICE_ACC_TOKEN_URI")
 	clientCertURL := os.Getenv("SERVICE_ACC_CLIENT_CERT_URL")
-
-	fmt.Printf(key)
 
 	config := Config{Key: key, Id: id, ProjectId: projectId, ClientEmail: clientEmail, ClientId: clientId, AuthURI: authURI, TokenURI: tokenURI, ClientCertURL: clientCertURL}
 	templateString := "{\n  \"type\": \"service_account\",\n  \"project_id\": \"{{.ProjectId}}\",\n  \"private_key_id\": \"{{.Id}}\",\n  \"private_key\": \"{{.Key}}\",\n  \"client_email\": \"{{.ClientEmail}}\",\n  \"client_id\": \"{{.ClientId}}\",\n  \"auth_uri\": \"{{.AuthURI}}\",\n  \"token_uri\": \"{{.TokenURI}}\",\n  \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n  \"client_x509_cert_url\": \"{{.ClientCertURL}}\"\n}\n"
