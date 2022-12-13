@@ -29,8 +29,6 @@ func (server *Server) Init(connection *database.Connection) {
 	})
 	// configure firebase
 	firebaseAuth := config.SetupFirebase()
-	//_, err = firebaseAuth.VerifyIDToken(context.Background(), token)
-	//fmt.Println(err)
 	server.App.Use(func(c *fiber.Ctx) error {
 		utils.SetLocal[*auth.Client](c, "firebaseAuth", firebaseAuth)
 		return c.Next()
@@ -38,7 +36,7 @@ func (server *Server) Init(connection *database.Connection) {
 	server.App.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
-		AllowHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+		AllowHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorisation",
 	}))
 	server.App.Use(middleware.AuthMiddleware)
 	routes.Register(server.App, server.Groups)
