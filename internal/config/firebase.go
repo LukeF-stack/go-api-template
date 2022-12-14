@@ -23,6 +23,7 @@ type Config struct {
 	ClientCertURL string
 }
 
+// SetupFirebase : registers the server with firebase (using .env variables to template the required JSON file)
 func SetupFirebase() *auth.Client {
 	err := godotenv.Load(".env")
 	if err != nil {
