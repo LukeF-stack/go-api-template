@@ -45,19 +45,15 @@ func main() {
 
 func (q *Queue) spawn(wg *sync.WaitGroup) {
 	defer wg.Done()
-	loopFunc := func() string {
-		return "hello"
+	for true {
+		time.Sleep(100 * time.Millisecond)
+		var newJob job.Job
+		query := q.db.First(&newJob)
+		if query.Error == nil {
+			if query.RowsAffected > 0 {
+				fmt.Println(newJob.Name)
+				q.db.Delete(&newJob)
+			}
+		}
 	}
-	fmt.Println(loopFunc)
-	//for true {
-	//	time.Sleep(100 * time.Millisecond)
-	//	var newJob job.Job
-	//	query := q.db.First(&newJob)
-	//	if query.Error == nil {
-	//		if query.RowsAffected > 0 {
-	//			fmt.Println(newJob.Name)
-	//			q.db.Delete(&newJob)
-	//		}
-	//	}
-	//}
 }
