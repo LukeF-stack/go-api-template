@@ -15,7 +15,8 @@ import (
 )
 
 type Queue struct {
-	db *gorm.DB
+	db   *gorm.DB
+	lock *sync.Mutex
 }
 
 func main() {
@@ -38,6 +39,8 @@ func main() {
 		fmt.Printf("starting queue process \n")
 		q := new(Queue)
 		q.db = gormDB
+		var m sync.Mutex
+		q.lock = &m
 		wg.Add(1)
 		go q.spawn(wg)
 		time.Sleep(2 * time.Second)
@@ -52,29 +55,33 @@ func (q *Queue) spawn(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for true {
 		time.Sleep(100 * time.Millisecond)
-		var newJob job.Job
-		query := q.db.First(&newJob)
-		if query.Error == nil {
-			if query.RowsAffected > 0 {
-				fmt.Println("processing job: " + newJob.Name)
-				if fileExists(newJob.Command) {
-					fmt.Println("executing command: " + newJob.Command)
-					cmd := exec.Command("go", "run", newJob.Command, newJob.Args)
-					cmd.Stdout = os.Stdout
-					cmd.Stderr = os.Stderr
-					err := cmd.Run()
+		go func() {
+			var newJob job.Job
+			q.lock.Lock()
+			query := q.db.First(&newJob)
+			if query.Error == nil {
+				if query.RowsAffected > 0 {
+					fmt.Println("processing job: " + newJob.Name)
+					if fileExists(newJob.Command) {
+						fmt.Println("executing command: " + newJob.Command)
+						cmd := exec.Command("go", "run", newJob.Command, newJob.Args)
+						cmd.Stdout = os.Stdout
+						cmd.Stderr = os.Stderr
+						err := cmd.Run()
 
-					if err != nil {
-						fmt.Println(err)
+						if err != nil {
+							fmt.Println(err)
+						} else {
+							fmt.Println("job successfully completed")
+							q.db.Delete(&newJob)
+						}
 					} else {
-						fmt.Println("job successfully completed")
 						q.db.Delete(&newJob)
 					}
-				} else {
-					q.db.Delete(&newJob)
 				}
 			}
-		}
+			q.lock.Unlock()
+		}()
 	}
 }
 
