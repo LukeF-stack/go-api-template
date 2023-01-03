@@ -56,18 +56,32 @@ func (q *Queue) spawn(wg *sync.WaitGroup) {
 		query := q.db.First(&newJob)
 		if query.Error == nil {
 			if query.RowsAffected > 0 {
-				fmt.Println(newJob.Name)
-				cmd := exec.Command("go", "run", newJob.Command, newJob.Args)
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				err := cmd.Run()
+				fmt.Println("processing job: " + newJob.Name)
+				if fileExists(newJob.Command) {
+					fmt.Println("executing command: " + newJob.Command)
+					cmd := exec.Command("go", "run", newJob.Command, newJob.Args)
+					cmd.Stdout = os.Stdout
+					cmd.Stderr = os.Stderr
+					err := cmd.Run()
 
-				if err != nil {
-					fmt.Println(err)
+					if err != nil {
+						fmt.Println(err)
+					} else {
+						fmt.Println("job successfully completed")
+						q.db.Delete(&newJob)
+					}
 				} else {
 					q.db.Delete(&newJob)
 				}
 			}
 		}
 	}
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
