@@ -4,7 +4,6 @@ import (
 	"example/bookAPI/internal/models/book"
 	"example/bookAPI/internal/server/types"
 	"example/bookAPI/internal/server/utils"
-	logger "example/bookAPI/pkg/logging"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -39,8 +38,8 @@ func CreateBook(c *fiber.Ctx) error {
 }
 
 func GetBook(c *fiber.Ctx) error {
-	storeLogger := utils.GetLocal[*logger.Logger](c, "firestoreClient")
-	storeLogger.Log("from the book route", utils.GetLocal[string](c, "uuid"))
+	//storeLogger := utils.GetLocal[*logger.Logger](c, "firestoreClient")
+	//storeLogger.Log("from the book route", utils.GetLocal[string](c, "uuid"))
 	database := utils.GetLocal[*gorm.DB](c, "db")
 	var status = 500
 	var e []string

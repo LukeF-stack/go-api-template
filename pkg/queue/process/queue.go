@@ -3,7 +3,6 @@ package process
 import (
 	"database/sql"
 	"errors"
-	"example/bookAPI/internal/models/job"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -53,11 +52,11 @@ func Process(process callback) error {
 		var m sync.Mutex
 		q.Lock = &m
 		wg.Add(1)
-		go q.Spawn(wg, process)
-		time.Sleep(2 * time.Second)
-		q.DB.Create(&job.Job{Name: "Test Job", Command: "pkg/queue/jobs/test/test.go", Args: `{"payload": "something"}`})
-		time.Sleep(8 * time.Second)
-		q.DB.Create(&job.Job{Name: "Test Job 2", Command: "pkg/queue/jobs/test/test.go", Args: `{"payload": "something 2"}`})
+		q.Spawn(wg, process)
+		//time.Sleep(2 * time.Second)
+		//q.DB.Create(&job.Job{Name: "Test Job", Command: "pkg/queue/jobs/test/test.go", Args: `{"payload": "something"}`})
+		//time.Sleep(8 * time.Second)
+		//q.DB.Create(&job.Job{Name: "Test Job 2", Command: "pkg/queue/jobs/test/test.go", Args: `{"payload": "something 2"}`})
 		defer wg.Wait()
 	}
 	return nil
@@ -67,10 +66,8 @@ func (q *Queue) Spawn(wg *sync.WaitGroup, callback callback) {
 	defer wg.Done()
 	for true {
 		time.Sleep(100 * time.Millisecond)
-		go func() {
-			q.Lock.Lock()
-			callback(q)
-			q.Lock.Unlock()
-		}()
+		q.Lock.Lock()
+		callback(q)
+		q.Lock.Unlock()
 	}
 }
