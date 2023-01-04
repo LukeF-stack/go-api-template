@@ -4,6 +4,8 @@ import (
 	"example/bookAPI/internal/controllers/authors"
 	"example/bookAPI/internal/controllers/books"
 	"example/bookAPI/internal/server/types"
+	processEvents "example/bookAPI/pkg/queue/process/sse"
+	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -21,4 +23,6 @@ func Register(app *fiber.App, groups types.Groups) {
 	groups["Book"].Get("/get", books.GetBook)
 	groups["Author"].Post("/create", authors.CreateAuthor)
 	groups["Author"].Get("/get", authors.GetAuthor)
+	// server events subscription route
+	app.Get("/sse", adaptor.HTTPHandler(processEvents.Handler(processEvents.DashboardHandler)))
 }

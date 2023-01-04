@@ -1,47 +1,74 @@
-package main
+package processEvents
 
 import (
-	"example/bookAPI/internal/models/job"
+	"bytes"
+	"encoding/json"
+	"example/bookAPI/internal/models/event"
 	"example/bookAPI/pkg/queue/process"
 	"fmt"
-	"os"
-	"os/exec"
+	"github.com/gofiber/fiber/v2"
+	"math/rand"
+	"net/http"
+	"time"
 )
 
-func main() {
-	process.Process(callback)
+func Listen(c *fiber.Ctx) error {
+	return process.Process(callback)
 }
 
 func callback(q *process.Queue) {
-	var newJob job.Job
-	query := q.DB.First(&newJob)
+	var newEvent event.Event
+	query := q.DB.First(&newEvent)
 	if query.Error == nil {
 		if query.RowsAffected > 0 {
-			fmt.Println("processing job: " + newJob.Name)
-			if fileExists(newJob.Command) {
-				fmt.Println("executing command: " + newJob.Command)
-				cmd := exec.Command("go", "run", newJob.Command, newJob.Args)
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				err := cmd.Run()
-
-				if err != nil {
-					fmt.Println(err)
-				} else {
-					fmt.Println("job successfully completed")
-					q.DB.Delete(&newJob)
-				}
-			} else {
-				q.DB.Delete(&newJob)
-			}
+			fmt.Println("processing event: " + newEvent.Name)
+			q.DB.Delete(&newEvent)
 		}
 	}
 }
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
+type Client struct {
+	name   string
+	events chan *DashBoard
+}
+type DashBoard struct {
+	User uint
+}
+
+func Handler(f http.HandlerFunc) http.Handler {
+	return f
+}
+func DashboardHandler(w http.ResponseWriter, r *http.Request) {
+	client := &Client{name: r.RemoteAddr, events: make(chan *DashBoard, 10)}
+	time.Sleep(5 * time.Second)
+	go updateDashboard(client)
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	timeout := time.After(5 * time.Second)
+	select {
+	case ev := <-client.events:
+		var buf bytes.Buffer
+		enc := json.NewEncoder(&buf)
+		enc.Encode(ev)
+		fmt.Fprintf(w, "data: %v\n\n", buf.String())
+		fmt.Printf("data: %v\n", buf.String())
+	case <-timeout:
+		fmt.Fprintf(w, ": nothing to sent\n\n")
 	}
-	return !info.IsDir()
+
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
+func updateDashboard(client *Client) {
+	for {
+		db := &DashBoard{
+			User: uint(rand.Uint32()),
+		}
+		client.events <- db
+	}
 }

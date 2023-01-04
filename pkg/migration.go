@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"example/bookAPI/internal/models/author"
 	"example/bookAPI/internal/models/book"
+	"example/bookAPI/internal/models/event"
 	"example/bookAPI/internal/models/job"
 	"fmt"
 	"gorm.io/driver/mysql"
@@ -30,6 +31,7 @@ func main() {
 		&author.Author{},
 		&book.Book{},
 		&job.Job{},
+		&event.Event{},
 	)
 	if err != nil {
 		log.Fatal(err)

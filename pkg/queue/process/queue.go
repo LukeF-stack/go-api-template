@@ -2,6 +2,7 @@ package process
 
 import (
 	"database/sql"
+	"errors"
 	"example/bookAPI/internal/models/job"
 	"fmt"
 	"gorm.io/driver/mysql"
@@ -39,10 +40,10 @@ func GetDB() (*gorm.DB, error) {
 	return gormDB, err
 }
 
-func Process(process callback) {
+func Process(process callback) error {
 	gormDB, err := GetDB()
 	if err != nil {
-		log.Fatal(err)
+		return errors.New("failed to establish db connection")
 	} else {
 		fmt.Println("connected to database")
 		var wg = &sync.WaitGroup{}
@@ -59,6 +60,7 @@ func Process(process callback) {
 		q.DB.Create(&job.Job{Name: "Test Job 2", Command: "pkg/queue/jobs/test/test.go", Args: `{"payload": "something 2"}`})
 		defer wg.Wait()
 	}
+	return nil
 }
 
 func (q *Queue) Spawn(wg *sync.WaitGroup, callback callback) {
