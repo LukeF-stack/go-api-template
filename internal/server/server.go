@@ -42,7 +42,7 @@ func (server *Server) Init(connection *database.Connection) {
 	server.App.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
-		AllowHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorisation",
+		AllowHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorisation, ResponseType",
 	}))
 	// set auth middleware which checks for valid ID Bearer Token passed with each request
 	server.App.Use(middleware.AuthMiddleware)
