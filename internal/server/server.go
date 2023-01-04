@@ -7,6 +7,7 @@ import (
 	"example/bookAPI/internal/routes"
 	"example/bookAPI/internal/server/types"
 	"example/bookAPI/internal/server/utils"
+	logger "example/bookAPI/pkg/logging"
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -31,7 +32,7 @@ func (server *Server) Init(connection *database.Connection) {
 		return c.Next()
 	})
 	// configure firebase auth
-	firebaseAuth := config.SetupFirebase()
+	firebaseAuth, firestoreClient := config.SetupFirebase()
 	// middleware to set the firebaseAuth struct as a local fiber variable (accessible through fiber context)
 	server.App.Use(func(c *fiber.Ctx) error {
 		utils.SetLocal[*auth.Client](c, "firebaseAuth", firebaseAuth)
@@ -45,6 +46,12 @@ func (server *Server) Init(connection *database.Connection) {
 	}))
 	// set auth middleware which checks for valid ID Bearer Token passed with each request
 	server.App.Use(middleware.AuthMiddleware)
+	// initialise logger
+	server.App.Use(func(c *fiber.Ctx) error {
+		l := logger.GetLogger(firestoreClient)
+		utils.SetLocal[*logger.Logger](c, "firestoreClient", l)
+		return c.Next()
+	})
 	// register route groups and routes
 	routes.Register(server.App, server.Groups)
 	// start server on port 3000

@@ -30,6 +30,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return c.JSON(types.Response{Error: e})
 	}
 	// set the UUID of the user to the fiber context
+	utils.SetLocal[string](c, "uuid", token.UID)
 	c.Set("UUID", token.UID)
 	return c.Next()
 }

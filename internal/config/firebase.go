@@ -1,9 +1,11 @@
 package config
 
 import (
+	"cloud.google.com/go/firestore"
 	"context"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
+	"fmt"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"log"
@@ -24,7 +26,7 @@ type Config struct {
 }
 
 // SetupFirebase : registers the server with firebase (using .env variables to template the required JSON file)
-func SetupFirebase() *auth.Client {
+func SetupFirebase() (*auth.Client, *firestore.Client) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
@@ -66,9 +68,16 @@ func SetupFirebase() *auth.Client {
 		panic("Firebase load error")
 	}
 	//Firebase Auth
-	auth, err := app.Auth(context.Background())
+	authObj, err := app.Auth(context.Background())
 	if err != nil {
 		panic("Firebase load error")
 	}
-	return auth
+	fmt.Println("Firebase: firebase auth initialised")
+	//Firestore
+	client, err := app.Firestore(context.Background())
+	if err != nil {
+		panic("Firebase load error")
+	}
+	fmt.Println("Firebase: firestore client initialised")
+	return authObj, client
 }

@@ -49,6 +49,7 @@ func main() {
 		q.db.Create(&job.Job{Name: "Test Job 2", Command: "pkg/queue/jobs/test/test.go", Args: `{"payload": "something 2"}`})
 		defer wg.Wait()
 	}
+
 }
 
 func (q *Queue) spawn(wg *sync.WaitGroup) {
